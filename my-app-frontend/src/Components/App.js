@@ -1,5 +1,4 @@
 import React, {useState}from 'react'
-import {Route, Routes } from "react-router-dom"
 import Login from './Login';
 import MealPlan from './mealPlan';
 import NavBar from './NavBar';
@@ -10,12 +9,27 @@ function App() {
     password: ""
   })
 const [loginStat, setLoginStat]= useState(false)
-const [mealData, setMealData] = useState({})
-// const [morningMeal, setMorningMeal]= useState ([])
-//  const [snackMeal, setSnackMeal]= useState ([])
-//   const [lunchMeal, setLunchMeal]= useState ([])
-//   const [dinnerMeal, setDinnerMeal]= useState ([])
 
+const [dayMeal, setDayMeal]= useState ([])
+
+function getDayMeal () {
+  fetch("http://localhost:9292/meal_plan")
+.then(resp => resp.json())
+.then(data =>{
+  console.log(data)
+    setDayMeal( data.map( d => ([
+      d.morning_image,
+      d.morning_meal,
+      d.after_meal_image,
+      d.after_meal_snack,
+      d.noon_image,
+      d.noon_meal,
+      d.evening_image,
+      d.evening_meal
+    ])))
+  }
+)
+}
   function onChange(e){
     if (e.target.name=== "username"){
       setLogin({...login, username: e.target.value})
@@ -24,26 +38,6 @@ const [mealData, setMealData] = useState({})
     }
   }
 
-  function getMealPlan () {
-    fetch("http://localhost:9292/meal_plan")
-    .then(resp => resp.json())
-    .then(data => setMealData(data)) 
-  }
-
-    //  function mealPlansorter (mealPlan){
-    //    mealPlan.map(meal=> {
-    //      setMorningMeal( morningMeal.push({name: meal.morning_meal, image: meal.morning_image}))
-    //      setSnackMeal(snackMeal.push({name: meal.after_meal_snack, image: meal.after_meal_image}))
-    //      setLunchMeal(lunchMeal.push({name: meal.noon_meal, image: meal.noon_image}))
-    //      setDinnerMeal(dinnerMeal.push({ name: meal.evening_meal, image: meal.evening_image}))
-    //    }
-    //    )
-    //    console.log(morningMeal)
-    //    console.log(snackMeal)
-    //    console.log(lunchMeal)
-    //    console.log(dinnerMeal)
-    //  }
-   
   function onLoginSubmit(e){
     e.preventDefault()
     e.stopPropagation()
@@ -53,7 +47,7 @@ const [mealData, setMealData] = useState({})
     body: JSON.stringify(login),
     })
     .then(resp => resp.json())
-    .then(data =>data.status == 200 ? setLoginStat(true) : setLoginStat(false)
+    .then(data =>data.status == 200 ? (setLoginStat(true), getDayMeal()) : setLoginStat(false)
         )
   }
 
@@ -70,18 +64,9 @@ const [mealData, setMealData] = useState({})
 
   return (
     <div>
-      <NavBar handleLogOut = {handleLogOut} loginStat={loginStat} getMealPlan= {getMealPlan}/>
-    <Routes>
-      <Route 
-      exact path = "/"
-      element= {<Login onLoginSubmit={onLoginSubmit} onChange={onChange}/>}>
-        </Route>
-      <Route
-      exact path = "/meal_plan"
-      element= {<MealPlan 
-      mealData = {mealData}/>}>
-      </Route>
-    </Routes>
+  <NavBar handleLogOut = {handleLogOut} loginStat={loginStat} />
+  <Login onLoginSubmit={onLoginSubmit} onChange={onChange} loginStat={loginStat}/>
+  <MealPlan loginStat={loginStat} dayMeal={dayMeal}/>
     </div>
   );
 }

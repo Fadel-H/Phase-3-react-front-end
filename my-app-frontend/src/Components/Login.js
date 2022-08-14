@@ -1,9 +1,9 @@
 import React from 'react'
 
-function Login({onChange, onLoginSubmit}) {
+function Login({onChange, onLoginSubmit, loginStat}) {
   return (
     <>
-      <form id="form" onSubmit={onLoginSubmit}>
+      { loginStat == false ? <form id="form" onSubmit={onLoginSubmit}>
        <div className="form-outline form-white mb-4">
         <input type="username" name="username" onChange={onChange} className="form-control form-control-lg" placeholder="username" required />
         <label className="form-label">Username</label>
@@ -13,7 +13,7 @@ function Login({onChange, onLoginSubmit}) {
         <label className="form-label">Password</label>
        </div>
       <button type="submit" className="btn btn-outline-light btn-lg px-5" >Login</button>
-      </form>
+      </form> : null}
     </>
   )
 }
