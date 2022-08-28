@@ -9,7 +9,6 @@ function App() {
     password: ""
   })
 const [loginStat, setLoginStat]= useState(false)
-
 const [dayMeal, setDayMeal]= useState ([])
 
 function getDayMeal () {
@@ -17,16 +16,7 @@ function getDayMeal () {
 .then(resp => resp.json())
 .then(data =>{
   console.log(data)
-    setDayMeal( data.map( d => ([
-      d.morning_image,
-      d.morning_meal,
-      d.after_meal_image,
-      d.after_meal_snack,
-      d.noon_image,
-      d.noon_meal,
-      d.evening_image,
-      d.evening_meal
-    ])))
+    setDayMeal(data)
   }
 )
 }
@@ -47,7 +37,7 @@ function getDayMeal () {
     body: JSON.stringify(login),
     })
     .then(resp => resp.json())
-    .then(data =>data.status == 200 ? (setLoginStat(true), getDayMeal()) : setLoginStat(false)
+    .then(data =>data.status === 200 ? (setLoginStat(true), getDayMeal()) : setLoginStat(false)
         )
   }
 
@@ -61,12 +51,16 @@ function getDayMeal () {
     }
   }
  
+  function handleRandomPlan(e){
+    e.stopPropagation()
+    getDayMeal()
+  }
 
   return (
     <div>
-  <NavBar handleLogOut = {handleLogOut} loginStat={loginStat} />
+  <NavBar handleLogOut = {handleLogOut} loginStat={loginStat} handleRandomPlan = {handleRandomPlan} />
   <Login onLoginSubmit={onLoginSubmit} onChange={onChange} loginStat={loginStat}/>
-  <MealPlan loginStat={loginStat} dayMeal={dayMeal}/>
+  { loginStat ? <MealPlan dayMeal={dayMeal}/> : null}
     </div>
   );
 }
